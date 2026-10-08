@@ -1,0 +1,64 @@
+service: cupo-vehicular
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: ${opt:stage, 'local'}
+  timeout: 30
+  environment:
+    PGHOST: ${env:PGHOST, 'localhost'}
+    PGPORT: ${env:PGPORT, '5432'}
+    PGUSER: ${env:PGUSER, 'cupo'}
+    PGPASSWORD: ${env:PGPASSWORD, 'cupo'}
+    PGDATABASE: ${env:PGDATABASE, 'cupo'}
+
+plugins:
+  - serverless-offline
+
+# El TypeScript se compila antes con `npm run build` (esbuild → dist/handler.js).
+package:
+  patterns:
+    - '!**'
+    - dist/**
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    noPrependStageInUrl: true
+
+# Una sola lambda con router interno: el enunciado pide "una lambda con los siguientes endpoints".
+functions:
+  api:
+    handler: dist/handler.main
+    events:
+      # 1. Crear colaborador
+      - httpApi:
+          method: POST
+          path: /colaboradores
+      # 2. Actualizar cupo
+      - httpApi:
+          method: PATCH
+          path: /colaboradores/{cedula}/cupo
+      # 3. Acreditar cupo
+      - httpApi:
+          method: POST
+          path: /colaboradores/{cedula}/acreditaciones
+      # 4. Registrar factura
+      - httpApi:
+          method: POST
+          path: /facturas
+      # 5. Sincronizar facturas
+      - httpApi:
+          method: POST
+          path: /sincronizaciones/facturas
+      # 6. Sincronizar GasClub
+      - httpApi:
+          method: POST
+          path: /sincronizaciones/gasclub
+      # Extra: consulta de saldo, historial de cupo y movimientos
+      - httpApi:
+          method: GET
+          path: /colaboradores/{cedula}

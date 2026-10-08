@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cupo-vehicular-db
+    # CURRENT_DATE (fecha por defecto de facturas/acreditaciones) en hora de Ecuador
+    command: ["postgres", "-c", "timezone=America/Guayaquil"]
+    environment:
+      POSTGRES_USER: cupo
+      POSTGRES_PASSWORD: cupo
+      POSTGRES_DB: cupo
+    ports:
+      - "${PGPORT:-5432}:5432"
+    volumes:
+      # Los scripts se ejecutan en orden alfabético al crear el contenedor por primera vez
+      - ./db:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cupo -d cupo"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:

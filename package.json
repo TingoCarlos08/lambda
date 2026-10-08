@@ -1,0 +1,28 @@
+{
+  "name": "cupo-vehicular",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lambda (Serverless) que lleva el saldo del cupo vehicular de colaboradores",
+  "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d",
+    "build": "esbuild src/handler.ts --bundle --platform=node --target=node20 --sourcemap --external:pg-native --outfile=dist/handler.js",
+    "start": "npm run build && serverless offline start",
+    "typecheck": "tsc --noEmit",
+    "escenario": "tsx scripts/escenario.ts"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^20.17.0",
+    "@types/pg": "^8.11.10",
+    "esbuild": "^0.24.0",
+    "serverless": "^3.39.0",
+    "serverless-offline": "^13.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

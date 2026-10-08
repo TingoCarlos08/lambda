@@ -1,0 +1,38 @@
+### Peticiones de ejemplo (extensión REST Client de VS Code o similar)
+@api = http://localhost:3000
+@cedula = 0912345678
+
+### 1. Crear colaborador
+POST {{api}}/colaboradores
+Content-Type: application/json
+
+{ "cedula": "{{cedula}}", "cupoMensual": 150 }
+
+### 2. Actualizar cupo (deja trazabilidad en CUPO_HISTORIAL)
+PATCH {{api}}/colaboradores/{{cedula}}/cupo
+Content-Type: application/json
+
+{ "cupoMensual": 300, "motivo": "Ajuste anual" }
+
+### 3. Acreditar cupo (suma el cupo actual al saldo)
+POST {{api}}/colaboradores/{{cedula}}/acreditaciones
+
+### 4. Registrar factura (queda Pendiente en SGR_FACTURAS y en CUPO_MOVIMIENTOS)
+POST {{api}}/facturas
+Content-Type: application/json
+
+{
+  "cedula": "{{cedula}}",
+  "numeroFactura": "001-001-000009999",
+  "rucProveedor": "1790012345001",
+  "total": 10.50
+}
+
+### 5. Sincronizar facturas
+POST {{api}}/sincronizaciones/facturas
+
+### 6. Sincronizar GasClub
+POST {{api}}/sincronizaciones/gasclub
+
+### Extra: consultar saldo, historial de cupo y movimientos
+GET {{api}}/colaboradores/{{cedula}}
